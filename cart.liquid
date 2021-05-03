@@ -1,0 +1,133 @@
+<div id="cart-page" class="container pt-xxl pb-xxl">
+
+  <template v-if="cart.items.length > 0">
+    <section>
+      <div class="sectionHeader">
+        <h1 class="sectionHeader-title">{{ 'cart.heading' | t }}</h1>
+      </div>
+      <form id="cart-form" action="{{ routes.cart_url }}" method="post">
+        <table class="table cartTable">
+          <thead>
+            <tr>
+              <th class="fs-md text-center">{{ 'cart.table.product' | t }}</th>
+              <th class="fs-md text-center">{{ 'cart.table.quantity' | t }}</th>
+              <th class="fs-md text-center">{{ 'cart.table.price' | t }}</th>
+              <th class="fs-md text-center"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr class="line-item-container" v-for="item in cart.items">
+              <td>
+                <div class="cartProduct">
+                  <div class="cartProduct-header">
+                    <div class="appImage inViewJs">
+                      <img :src="item.image"/>
+                    </div>
+                  </div>
+                  <div class="cartProduct-body text-start">
+                    <a href="item.url"><h4 class="fs-md" v-html="item.title"></h4></a>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <input type="number" min="1" class="cart-item-qty form-select quantityInput mx-auto" v-model="item.quantity" @change="update_cart(item.variant_id, item.quantity)">
+              </td>
+              <td class="fs-md text-center js-price" id="line-item-total" v-html="item.final_line_price"></td>
+              <td class="text-center">
+                <div class="btn p-0 fs-md" @click="remove_from_cart(item.variant_id)"><svg class="svgIcon"><use xlink:href="#icon-remove"></use></svg></div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <div class="row justify-content-end cart-total mt-lg">
+          <b class="col-md-2">{{ 'cart.table.total' | t }}</b>
+          <b class="col-md-2 cart-total-price" v-html="cart.total_price"></b>
+
+        </div>
+        <div class="mt-lg text-end d-md-block d-none">
+          <input type="submit" name="update" class="btn btn-outline me-2 fs-md mt-md" id="update-btn" value="{{ 'cart.button.update' | t }}">
+          <a class="btn btn-outline me-2 fs-md mt-md" href="{{ routes.all_products_collection_url }}">{{ 'cart.button.shopping' | t }}</a>
+          <input class="btn btn-secondary fs-md mt-md" type="submit" name="checkout" value="{{ 'cart.button.checkout' | t }}">
+        </div>
+      </form>
+    </section>
+  </template>
+
+  <template v-else>
+    <div class="theEmpty-cart">
+      <div class="theEmpty-container pt-xl pb-xxl">
+        <div class="theCart-thumb">
+          <svg class="icon" aria-hidden="true" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112.63 129.54"><g data-name="Layer 2"><g data-name="Layer 1"><path d="M10.67 50.51a43.9 43.9 0 1036.8-50 43.91 43.91 0 00-36.8 50" fill="red"></path><path d="M83.5 112.45H46.3c1.44 1.63 3.5 3.09 4.22 5a11.34 11.34 0 01.09 6.75c-1 3.51-5 5.63-8.45 5.25a8.54 8.54 0 01-7.53-6.59c-1-4.38.68-7.54 5.65-10.38-.81-.3-1.38-.52-2-.72-5.32-1.86-8.5-5.52-9.15-11.15q-3.65-32.01-7.24-64.08c-.23-2-.49-4.05-.65-6.08-.23-3-1.92-4.36-4.8-4.37H0v-8.25c6.46 0 13-.52 19.4.15 6.23.66 9.77 5.56 10.44 11.8 2 18.66 4.13 37.29 6.23 55.94 0 .18.18.34.39.74.87 0 1.87.12 2.86.12h50.54c4.6 0 5.79-1 6.65-5.41 2.1-10.69 4.24-21.37 6.32-32.06.35-1.78.49-3.6.75-5.56h9c-1.11 5.77-2.16 11.34-3.28 16.91-1.55 7.78-3.17 15.56-4.74 23.34C103.17 91 98.5 94.93 91.1 95H37.08a37.83 37.83 0 00.84 5.87c.78 2.54 2.94 3 5.39 3h51.04v8.47h-4.87c1.53 1.89 3.59 3.5 4.29 5.57a11.26 11.26 0 01-.21 6.74c-1.12 3.32-5.06 5.29-8.39 4.89a8.86 8.86 0 01-7.54-6.66c-.87-4.18.78-7.35 5.87-10.38"></path><path d="M79.39 26.16c2.26 2.35 4.09 4.26 6.25 6.49l-15.53 15L85.6 62.46l-6.23 6.33-15.11-15.17-14.79 15.24-5.93-6.25 14.71-14.32-15.1-15 6.17-6.16c4.62 4.67 9.55 9.65 14.56 14.73l15.51-15.7"></path></g></g></svg>		</div>
+        <div class="theCart-shape"></div>
+        <div class="theCart-content">
+          <h1>{{ 'cart.empty.heading' | t }}</h1>
+          <a class="btn btn-secondary wc-backward mt-md" href="{{ routes.all_products_collection_url }}" title="{{ 'cart.empty.shopping' | t }}">
+            {{ 'cart.empty.shopping' | t }}</a>
+        </div>
+      </div>
+    </div>
+  </template>
+
+</div>
+
+
+<script>
+  const CartPage = {
+    data () {
+      return {
+        cart: {
+          items: []
+        }
+      }
+    },
+
+    created () {
+      this.get_cart();
+    },
+
+    methods: {
+
+      get_cart() {
+        $.get('/cart.js')
+        .then(response => JSON.parse(response))
+        .then(cart => {
+          this.set_cart(cart);
+        })
+      },
+
+      set_cart(cart) {
+        this.cart=cart;
+        this.format_prices();
+      },
+
+      update_cart(id, qty) {
+        $.post('/cart/update.js', `updates[${id}]=${qty}`)
+        .then(response => JSON.parse(response))
+        .then(cart => {
+          this.set_cart(cart);
+          this.get_cart();
+        });
+
+      },
+
+      format_prices() {
+        this.cart.items.forEach(item => {
+          item.formatted_line_price = Shopify.formatMoney(item.line_Price);
+        });
+        this.cart.formatted_total_price = shopify.formatMoney(this.cart.total_price);
+      },
+
+
+      remove_from_cart(id) {
+        this.update_cart(id, 0);
+      }
+
+    }
+
+  }  
+
+  Vue.createApp(CartPage).mount('#cart-page');
+
+</script>
